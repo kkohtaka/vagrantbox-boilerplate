@@ -1,0 +1,33 @@
+{
+  "_copyright": "Copyright (c) 2016 Kazumasa Kohtaka. All rights reserved. This file is available under the MIT license.",
+  "variables": {
+    "home_directory": "{{ env `HOME` }}",
+    "artifact_base": "packer"
+  },
+  "builders": [
+    {
+      "type": "virtualbox-ovf",
+      "source_path": "{{ user `home_directory` }}/.vagrant.d/boxes/boxcutter-VAGRANTSLASH-ubuntu1610/2.0.19/virtualbox/box.ovf",
+      "ssh_username": "vagrant",
+      "ssh_password": "vagrant",
+      "ssh_port": 22,
+      "shutdown_command": "sudo systemctl poweroff",
+      "vboxmanage": [
+        ["modifyvm", "{{ .Name }}", "--memory", "512"],
+        ["modifyvm", "{{ .Name }}", "--cpus", "1"]
+      ],
+      "headless": true,
+      "output_directory": "output"
+    }
+  ],
+  "provisioners": [{
+    "type": "shell",
+    "scripts": [
+      "scripts/setup.sh"
+    ]
+  }],
+  "post-processors": [{
+    "type": "vagrant",
+    "output": "{{ user `artifact_base` }}-{{ .Provider }}.box"
+  }]
+}
